@@ -1,5 +1,8 @@
 package main;
 
+import main.atomic_variables.Account;
+import main.atomic_variables.Bank;
+import main.atomic_variables.Company;
 import main.blocking_threadsafe_list_by_priority.Event;
 import main.blocking_threadsafe_list_by_priority.PTask;
 import main.blocking_threadsafe_lists.Client;
@@ -26,7 +29,33 @@ public class Main {
         // blockingThreadsafeListByPriorityExample();
         // threadsafeListsWithDelayedElementsExample();
         // threadsafeNavigableMapExample();
-        generatingConcurrentRandomNumbersExample();
+        // generatingConcurrentRandomNumbersExample();
+        atomicVariablesExample();
+    }
+
+    private static void atomicVariablesExample() {
+        Account account = new Account();
+        account.setBalance(1000);
+
+        Company company = new Company(account);
+        Thread companyThread = new Thread(company);
+        Bank bank = new Bank(account);
+        Thread bankThread = new Thread(bank);
+
+        System.out.printf("Account : Initial Balance: %d\n", account.
+                getBalance());
+
+        companyThread.start();
+        bankThread.start();
+
+        try {
+            companyThread.join();
+            bankThread.join();
+            System.out.printf("Account : Final Balance: %d\n", account.
+                    getBalance());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void generatingConcurrentRandomNumbersExample() {
