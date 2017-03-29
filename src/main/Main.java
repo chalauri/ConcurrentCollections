@@ -1,5 +1,7 @@
 package main;
 
+import main.atomic_arrays.Decrementer;
+import main.atomic_arrays.Incrementer;
 import main.atomic_variables.Account;
 import main.atomic_variables.Bank;
 import main.atomic_variables.Company;
@@ -17,6 +19,7 @@ import main.threadsafe_navigable_maps.Contact;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
  * Created by G.Chalauri on 03/29/17.
@@ -30,7 +33,43 @@ public class Main {
         // threadsafeListsWithDelayedElementsExample();
         // threadsafeNavigableMapExample();
         // generatingConcurrentRandomNumbersExample();
-        atomicVariablesExample();
+        // atomicVariablesExample();
+        atomicArraysExample();
+    }
+
+    private static void atomicArraysExample(){
+        final int THREADS=100;
+        AtomicIntegerArray vector=new AtomicIntegerArray(1000);
+
+        Incrementer incrementer=new Incrementer(vector);
+        Decrementer decrementer=new Decrementer(vector);
+
+        Thread threadIncrementer[]=new Thread[THREADS];
+        Thread threadDecrementer[]=new Thread[THREADS];
+
+        for (int i=0; i<THREADS; i++) {
+            threadIncrementer[i]=new Thread(incrementer);
+            threadDecrementer[i]=new Thread(decrementer);
+            threadIncrementer[i].start();
+            threadDecrementer[i].start();
+        }
+
+        for (int i=0; i<THREADS; i++) {
+            try {
+                threadIncrementer[i].join();
+                threadDecrementer[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (int i=0; i<vector.length(); i++){
+            if (vector.get(i)!=0) {
+                System.out.println("Vector["+i+"] : "+vector.get(i));
+            }
+        }
+
+        System.out.println("Main: End of the example");
     }
 
     private static void atomicVariablesExample() {
