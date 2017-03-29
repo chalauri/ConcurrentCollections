@@ -3,6 +3,7 @@ package main;
 import main.blocking_threadsafe_list_by_priority.Event;
 import main.blocking_threadsafe_list_by_priority.PTask;
 import main.blocking_threadsafe_lists.Client;
+import main.generating_concurrent_random_numbers.TaskLocalRandom;
 import main.nonblocking_threadsafe_lists.AddTask;
 import main.nonblocking_threadsafe_lists.PollTask;
 import main.threadsafe_lists_with_delayed_elements.DEvent;
@@ -24,7 +25,18 @@ public class Main {
         // blockingThreadsafeListsExample();
         // blockingThreadsafeListByPriorityExample();
         // threadsafeListsWithDelayedElementsExample();
-        threadsafeNavigableMapExample();
+        // threadsafeNavigableMapExample();
+        generatingConcurrentRandomNumbersExample();
+    }
+
+    private static void generatingConcurrentRandomNumbersExample() {
+        Thread threads[] = new Thread[3];
+
+        for (int i = 0; i < 3; i++) {
+            TaskLocalRandom task = new TaskLocalRandom();
+            threads[i] = new Thread(task);
+            threads[i].start();
+        }
     }
 
     private static void threadsafeNavigableMapExample() {
@@ -74,7 +86,7 @@ public class Main {
                         getPhone());
             }
         } while (element != null);
-}
+    }
 
     private static void threadsafeListsWithDelayedElementsExample() throws InterruptedException {
         DelayQueue<DEvent> queue = new DelayQueue<>();
